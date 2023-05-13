@@ -302,10 +302,8 @@ def not_boundary_odd(N, adjacent_N, adjacent_coords_N, mesh_coordinates, adjacen
 
 def plot_two_generations_and_dict(initial_mesh_coordinates, initial_adjacent_points,
                                   Gen1_mesh_coordinates, Gen1_adjacent_points, division_dict):
-    # Create a GridSpec object
     gs = gridspec.GridSpec(1, 5)
 
-    # Flatten division_dict values to a list
     divided_points = [item for sublist in division_dict.values() for item in sublist]
 
     # Plot Initial Cells
@@ -333,14 +331,12 @@ def plot_two_generations_and_dict(initial_mesh_coordinates, initial_adjacent_poi
             ax1.plot(*zip(Gen1_mesh_coordinates[point], Gen1_mesh_coordinates[adjacent]), color='k', linewidth=0.5)
     ax1.set_title('First Generation')
 
-    # Plot Division Dictionary
     ax2 = plt.subplot(gs[0, 4])
     ax2.axis('off')
     ax2.set_title('Division Dictionary')
     dict_text = "\n".join([f'{k} -> {v}' for k, v in division_dict.items()])
     ax2.text(0.1, 0.5, dict_text, fontsize=12)
 
-    # Show the plot
     plt.tight_layout()
     plt.show()
 
