@@ -71,9 +71,9 @@ def division_selection(mesh_coordinates, adjacent_points, P, R, division_dict):
                 boundary_odd(N, N_coords, adjacent_coords_N, division_dict)
         else:
             if len(adjacent_N) % 2 == 0:
-                mesh_coordinates, adjacent_points = not_boundary_even(N, N_coords, adjacent_N, adjacent_coords_N, mesh_coordinates, adjacent_points, division_dict)
+                mesh_coordinates, adjacent_points = not_boundary_even(N, adjacent_N, adjacent_coords_N, mesh_coordinates, adjacent_points, division_dict)
             else:
-                mesh_coordinates, adjacent_points = not_boundary_odd(N, N_coords, adjacent_N, adjacent_coords_N, mesh_coordinates, adjacent_points, division_dict)
+                mesh_coordinates, adjacent_points = not_boundary_odd(N, adjacent_N, adjacent_coords_N, mesh_coordinates, adjacent_points, division_dict)
     print(f"new adjacent{adjacent_points}")
     return mesh_coordinates, adjacent_points
 def boundary_even(point, point_coords, adjacent_coords, division_dict):
