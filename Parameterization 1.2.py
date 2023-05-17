@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from fenics import Point
 from mshr import generate_mesh, Circle
 from dolfin import cells
+from jaxopt import ScipyBoundedMinimize
 from jax.scipy.optimize import minimize
 
 def generate_3d_mesh(R, N):
@@ -113,29 +114,33 @@ def spher_potential_computation_numerical(G, G2, adjacent_points):
         total = 0.0
         for i in range(N):
             p1 = (G[i, 0], G[i, 1], z[i])
-            p3 = (G2[i, 0], G2[i, 1], G[i, 2])
+            p3 = (G2[i, 0], G2[i, 1], G2[i, 2])
             for j in adjacent_points[i]:
                 p2 = (G[j, 0], G[j, 1], z[j])
-                p4 = (G2[j, 0], G2[j, 1], G[j, 2])
-                total += (distance_3d(p1, p2))**2- (distance_3d(p3, p4)**2)**2
+                p4 = (G2[j, 0], G2[j, 1], G2[j, 2])
+                total += (distance_3d(p1, p2)) ** 2 - (distance_3d(p3, p4) ** 2) ** 2
         return total
 
     dF_dz = jit(grad(F))
-    # Initial guess for the z-values
-    z_guess = jnp.zeros(N)
+
+    key = random.PRNGKey(0)
+    z_noise = 0.01 * random.normal(key, shape=(N,))
+    z_guess = G[:, 2] + z_noise
 
     def equations(z_vals):
         return jnp.sum(jnp.abs(dF_dz(z_vals)))
-    # Solve the system of PDEs numerically
-    res = minimize(equations, z_guess, method='BFGS')
-    z_solutions = res.x
 
-    # Update the z-values in the mesh
+    lower_bounds = jnp.zeros_like(z_guess)
+    upper_bounds = jnp.ones_like(z_guess) * jnp.inf
+    bounds = (lower_bounds, upper_bounds)
+
+    lbfgsb = ScipyBoundedMinimize(fun=equations, method="l-bfgs-b")
+    res = lbfgsb.run(z_guess, bounds=bounds)
+    z_solutions = res.params
+
     G = G.at[:, 2].set(z_solutions)
 
     return G
-
-
 
 def plot_3d_mesh(mesh, mesh_coordinates_3d, adjacent_points, distances):
     fig = plt.figure()
