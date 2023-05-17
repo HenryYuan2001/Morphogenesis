@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from fenics import Point
 from mshr import generate_mesh, Circle
 from dolfin import cells
-from scipy.optimize import minimize
+from jax.scipy.optimize import minimize
 
 def generate_3d_mesh(R, N):
     domain = Circle(Point(0., 0.), R)
