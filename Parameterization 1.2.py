@@ -1,5 +1,5 @@
 import jax.numpy as jnp
-from jax import grad, jit
+from jax import grad, jit, random
 import numpy as np
 import matplotlib.pyplot as plt
 from fenics import Point
@@ -92,18 +92,16 @@ def potential_computation_numerical(G, adjacent_points, avg_distance):
 
     dF_dz = jit(grad(F))
 
-    # Initial guess for the z-values
-    z_guess = jnp.zeros(N)
+    key = random.PRNGKey(0)
+    z_noise = 0.01 * random.normal(key, shape=(N,))
+    z_guess = G[:, 2] + z_noise
 
-    # Define a function to pass to minimize
     def equations(z_vals):
         return jnp.sum(jnp.abs(dF_dz(z_vals)))
 
-    # Solve the system of PDEs numerically
     res = minimize(equations, z_guess, method='BFGS')
     z_solutions = res.x
 
-    # Update the z-values in the mesh
     G = G.at[:, 2].set(z_solutions)
 
     return G
