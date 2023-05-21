@@ -57,7 +57,8 @@ def calculate_distances(mesh_coordinates_3d, adjacent_points):
 def spherical_para(R, mesh_coordinates_3d):
     x, y, _ = jnp.hsplit(mesh_coordinates_3d, 3)
     z = jnp.sqrt(R**2 - x**2 - y**2)
-    z = z.ravel()  # Flatten the array
+    z = jnp.where(jnp.isnan(z), 0, z)  
+    z = z.ravel()
 
     G = create_base_matrix(len(mesh_coordinates_3d))
     G = G.at[:, :2].set(mesh_coordinates_3d[:, :2])
